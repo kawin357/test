@@ -1,63 +1,295 @@
-<!doctype html>
+<!DOCTYPE html>
 <html lang="en">
-  <head>
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Chatz.IO - AI Study Assistant for Students</title>
-    <meta name="description" content="Chatz.IO is an AI-powered study assistant designed for students. Get instant help with homework, exam preparation, research, and academic support. Available 24/7 for all your learning needs.">
-    <meta name="author" content="Integer.IO" />
-    <meta name="keywords" content="Chatz.IO, student AI assistant, homework help, exam prep, study assistant, tutoring AI, academic support, learning AI, student chatbot, education technology, Integer.IO, Kawin M.S">
-    <meta name="robots" content="index, follow, max-snippet:-1, max-image-preview:large, max-video-preview:-1" />
-    <meta name="googlebot" content="index, follow" />
-    <meta name="bingbot" content="index, follow" />
-    <meta property="og:site_name" content="Integer.IO" />
-    <meta property="og:locale" content="en_US" />
-    <meta property="article:author" content="Kawin M.S" />
-    <meta name="twitter:creator" content="@integerio" />
-    <meta name="twitter:site" content="@integerio" />
-    <script type="application/ld+json">
-    {
-      "@context": "https://schema.org",
-      "@type": "WebApplication",
-      "name": "Chatz.IO - Student AI Assistant",
-      "description": "AI-powered study assistant for students - homework help, exam preparation, and academic support",
-      "url": "https://integer-io.netlify.app/",
-      "applicationCategory": "EducationalApplication",
-      "operatingSystem": "Web Browser",
-      "audience": {
-        "@type": "EducationalAudience",
-        "educationalRole": "student"
-      },
-      "author": {
-        "@type": "Organization",
-        "name": "Integer.IO",
-        "founder": {
-          "@type": "Person",
-          "name": "Kawin M.S"
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Gemini AI Chat</title>
+    <style>
+        :root {
+            --background-color: #0a0a0a;
+            --surface-color: rgba(20, 20, 20, 0.8);
+            --primary-color: #6366f1;
+            --text-color: #e5e7eb;
+            --subtle-text-color: #9ca3af;
+            --border-color: #374151;
+            --font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
         }
-      }
-    }
-    </script>
-    <meta name="robots" content="index, follow" />
-    <meta name="theme-color" content="#2563eb" />
 
-    <meta property="og:type" content="website" />
-    <meta property="og:title" content="Chatz.IO - AI Study Assistant for Students" />
-    <meta property="og:description" content="Your 24/7 AI study companion. Get instant help with homework, exam preparation, research, and all your academic needs." />
-    <meta property="og:url" content="https://integer-io.netlify.app/" />
-    <meta property="og:image" content="/bot-og.png" />
+        *, *::before, *::after {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
 
-    <meta name="twitter:card" content="summary_large_image" />
-    <meta name="twitter:title" content="Chatz.IO - Student AI Assistant" />
-    <meta name="twitter:description" content="Get instant homework help, exam prep support, and academic assistance with your AI study companion." />
-    <meta name="twitter:image" content="/bot-og.png" />
+        html, body {
+            height: 100%;
+            width: 100%;
+            overflow: hidden;
+        }
 
-    <link rel="canonical" href="https://integer-io.netlify.app/" />
-    <link rel="icon" type="image/png" href="./src/assets/company-logo.png">
+        body {
+            background-color: var(--background-color);
+            color: var(--text-color);
+            font-family: var(--font-family);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+
+        #vanta-bg {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: 0;
+        }
+
+        #root {
+            width: 100%;
+            height: 100%;
+            z-index: 1;
+            position: relative;
+        }
+
+        .app-container {
+            display: flex;
+            flex-direction: column;
+            height: 100%;
+            width: 100%;
+            background-color: transparent;
+        }
+        
+        header {
+            background: rgba(10, 10, 10, 0.5);
+            backdrop-filter: blur(10px);
+            padding: 1rem;
+            border-bottom: 1px solid var(--border-color);
+            z-index: 10;
+        }
+
+        nav {
+            max-width: 800px;
+            margin: 0 auto;
+            display: flex;
+            gap: 1.5rem;
+        }
+
+        nav a {
+            color: var(--subtle-text-color);
+            text-decoration: none;
+            font-weight: 600;
+            transition: color 0.2s ease;
+            cursor: pointer;
+        }
+
+        nav a:hover, nav a.active {
+            color: var(--primary-color);
+        }
+
+        main {
+            flex-grow: 1;
+            overflow: hidden;
+            display: flex;
+            flex-direction: column;
+            max-width: 800px;
+            width: 100%;
+            margin: 0 auto;
+            padding: 1rem;
+        }
+
+        /* Chat Page Styles */
+        .chat-page {
+            display: flex;
+            flex-direction: column;
+            height: 100%;
+            gap: 1rem;
+        }
+
+        .chat-history {
+            flex-grow: 1;
+            overflow-y: auto;
+            padding-right: 10px;
+        }
+        .chat-history::-webkit-scrollbar {
+            width: 6px;
+        }
+        .chat-history::-webkit-scrollbar-thumb {
+            background: var(--border-color);
+            border-radius: 3px;
+        }
+        .chat-history::-webkit-scrollbar-track {
+            background: transparent;
+        }
+
+        .message {
+            margin-bottom: 1rem;
+            display: flex;
+            flex-direction: column;
+        }
+        .message.user {
+            align-items: flex-end;
+        }
+        .message.bot {
+            align-items: flex-start;
+        }
+        
+        .message-content {
+            max-width: 85%;
+            padding: 0.75rem 1rem;
+            border-radius: 12px;
+            line-height: 1.6;
+        }
+
+        .message.user .message-content {
+            background-color: var(--primary-color);
+            color: white;
+            border-bottom-right-radius: 2px;
+        }
+
+        .message.bot .message-content {
+            background-color: var(--surface-color);
+            border: 1px solid var(--border-color);
+            border-bottom-left-radius: 2px;
+            color: var(--text-color);
+        }
+
+        .message.bot .message-content p {
+          margin-bottom: 0.5em;
+        }
+        .message.bot .message-content a {
+          color: var(--primary-color);
+          text-decoration: none;
+        }
+        .message.bot .message-content a:hover {
+          text-decoration: underline;
+        }
+
+        /* Code block styling */
+        pre {
+            background-color: #1e1e1e;
+            color: #d4d4d4;
+            padding: 1em;
+            border-radius: 8px;
+            overflow-x: auto;
+            font-family: 'Courier New', Courier, monospace;
+            font-size: 0.9em;
+            margin: 1em 0;
+            border: 1px solid var(--border-color);
+        }
+
+        code {
+            font-family: 'Courier New', Courier, monospace;
+        }
+        
+        pre code {
+            background: none;
+            padding: 0;
+        }
+
+        .chat-form {
+            display: flex;
+            gap: 10px;
+            border-top: 1px solid var(--border-color);
+            padding-top: 1rem;
+        }
+        
+        .chat-form input {
+            flex-grow: 1;
+            background-color: var(--surface-color);
+            border: 1px solid var(--border-color);
+            border-radius: 8px;
+            padding: 0.75rem 1rem;
+            color: var(--text-color);
+            font-size: 1rem;
+            outline: none;
+            transition: border-color 0.2s ease;
+        }
+
+        .chat-form input:focus {
+            border-color: var(--primary-color);
+        }
+
+        .chat-form button {
+            background-color: var(--primary-color);
+            border: none;
+            color: white;
+            padding: 0.75rem 1.5rem;
+            border-radius: 8px;
+            font-size: 1rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: opacity 0.2s ease;
+        }
+
+        .chat-form button:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+        }
+
+        /* Contact Page Styles */
+        .contact-page {
+          padding: 2rem;
+          background-color: var(--surface-color);
+          border: 1px solid var(--border-color);
+          border-radius: 12px;
+          height: 100%;
+          overflow-y: auto;
+        }
+        .contact-page h1 {
+          color: var(--primary-color);
+          margin-bottom: 1.5rem;
+        }
+        .contact-page p {
+          line-height: 1.8;
+          margin-bottom: 1rem;
+        }
+        .contact-page a {
+          color: var(--primary-color);
+          font-weight: 600;
+        }
+
+        .loading-indicator {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            color: var(--subtle-text-color);
+            font-style: italic;
+        }
+        .loading-indicator .dot {
+            width: 8px;
+            height: 8px;
+            background-color: var(--subtle-text-color);
+            border-radius: 50%;
+            animation: bounce 1.4s infinite ease-in-out both;
+        }
+        .loading-indicator .dot:nth-child(1) { animation-delay: -0.32s; }
+        .loading-indicator .dot:nth-child(2) { animation-delay: -0.16s; }
+        @keyframes bounce {
+            0%, 80%, 100% { transform: scale(0); }
+            40% { transform: scale(1.0); }
+        }
+    </style>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/styles/atom-one-dark.min.css">
+<script type="importmap">
+{
+  "imports": {
+    "@google/genai": "https://aistudiocdn.com/@google/genai@^1.29.0",
+    "preact/": "https://aistudiocdn.com/preact@^10.27.2/",
+    "preact": "https://aistudiocdn.com/preact@^10.27.2",
+    "htm": "https://aistudiocdn.com/htm@^3.1.1"
+  }
+}
+</script>
 </head>
-
-  <body>
+<body>
+    <div id="vanta-bg"></div>
     <div id="root"></div>
-    <script type="module" src="/src/main.tsx"></script>
-  </body>
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r134/three.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/vanta@0.5.24/dist/vanta.net.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/highlight.min.js"></script>
+    <script type="module" src="/index.tsx"></script>
+</body>
 </html>
